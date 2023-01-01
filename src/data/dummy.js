@@ -1,14 +1,14 @@
 import React from 'react';
-import { AiOutlineCalendar, AiOutlineShoppingCart, AiOutlineAreaChart, AiOutlineBarChart, AiOutlineStock } from 'react-icons/ai';
-import { FiShoppingBag, FiEdit, FiPieChart, FiBarChart, FiCreditCard, FiStar, FiShoppingCart } from 'react-icons/fi';
-import { BsKanban, BsBarChart, BsBoxSeam, BsCurrencyDollar, BsShield, BsChatLeft } from 'react-icons/bs';
-import { BiColorFill } from 'react-icons/bi';
-import { IoMdContacts } from 'react-icons/io';
-import { RiContactsLine, RiStockLine } from 'react-icons/ri';
+import { AiOutlineCalendar, AiOutlineAreaChart, AiOutlineBarChart, AiOutlineStock } from 'react-icons/ai';
+import { RiDashboardLine} from 'react-icons/ri';
+import { BsKanban, BsFillPeopleFill, BsBoxSeam, BsCurrencyDollar, BsShield, BsChatLeft, BsBuilding } from 'react-icons/bs';
+import {FiBarChart, FiCreditCard, FiShoppingCart, FiStar} from 'react-icons/fi';
+import { BiReceipt } from 'react-icons/bi';
+import { IoMdContacts, IoIosPeople, IoIosChatbubbles } from 'react-icons/io';
+import { FaQuestionCircle } from 'react-icons/fa';
 import { MdOutlineSupervisorAccount } from 'react-icons/md';
 import { HiOutlineRefresh } from 'react-icons/hi';
-import { TiTick } from 'react-icons/ti';
-import { GiLouvrePyramid } from 'react-icons/gi';
+import { TiTick, TiMessages } from 'react-icons/ti';
 import { GrLocation } from 'react-icons/gr';
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
@@ -471,11 +471,11 @@ export const employeesGrid = [
 
 export const links = [
   {
-    title: 'Dashboard',
+    title: 'Home',
     links: [
       {
-        name: 'ecommerce',
-        icon: <FiShoppingBag />,
+        name: 'Dashboard',
+        icon: <RiDashboardLine />,
       },
     ],
   },
@@ -484,16 +484,24 @@ export const links = [
     title: 'Pages',
     links: [
       {
-        name: 'orders',
-        icon: <AiOutlineShoppingCart />,
+        name: 'Rent Receipts',
+        icon: <BiReceipt />,
       },
       {
-        name: 'employees',
+        name: 'Rentees',
+        icon: <BsFillPeopleFill />,
+      },
+      {
+        name: 'Properties',
+        icon: <BsBuilding />,
+      },
+      {
+        name: 'Customers',
+        icon: <IoIosPeople />,
+      },
+      {
+        name: 'Admins',
         icon: <IoMdContacts />,
-      },
-      {
-        name: 'customers',
-        icon: <RiContactsLine />,
       },
     ],
   },
@@ -501,59 +509,44 @@ export const links = [
     title: 'Apps',
     links: [
       {
-        name: 'calendar',
+        name: 'Calendar',
         icon: <AiOutlineCalendar />,
       },
       {
-        name: 'kanban',
+        name: 'Kanban',
         icon: <BsKanban />,
       },
       {
-        name: 'editor',
-        icon: <FiEdit />,
+        name: 'Chat',
+        icon: <IoIosChatbubbles />,
       },
       {
-        name: 'color-picker',
-        icon: <BiColorFill />,
+        name: 'Messages',
+        icon: <TiMessages />,
+      },
+      {
+        name: 'FAQ',
+        icon: <FaQuestionCircle />,
       },
     ],
   },
   {
-    title: 'Charts',
+    title: 'Reports',
     links: [
       {
-        name: 'line',
+        name: 'Weekly',
         icon: <AiOutlineStock />,
       },
       {
-        name: 'area',
+        name: 'Monthly',
         icon: <AiOutlineAreaChart />,
       },
 
       {
-        name: 'bar',
+        name: 'Yearly',
         icon: <AiOutlineBarChart />,
       },
-      {
-        name: 'pie',
-        icon: <FiPieChart />,
-      },
-      {
-        name: 'financial',
-        icon: <RiStockLine />,
-      },
-      {
-        name: 'color-mapping',
-        icon: <BsBarChart />,
-      },
-      {
-        name: 'pyramid',
-        icon: <GiLouvrePyramid />,
-      },
-      {
-        name: 'stacked',
-        icon: <AiOutlineBarChart />,
-      },
+      
     ],
   },
 ];

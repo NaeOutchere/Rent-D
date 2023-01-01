@@ -10,6 +10,10 @@ module.exports = {
       fontSize: {
         14: '14px',
       },
+      colors: {
+        'main-blue': '#274254',
+        'main-orange': '#e07229',
+      },
       backgroundColor: {
         'main-bg': '#FAFBFB',
         'main-dark-bg': '#20232A',
@@ -40,7 +44,7 @@ module.exports = {
       },
       backgroundImage: {
         'hero-pattern':
-          "url('https://demos.wrappixel.com/premium-admin-templates/react/flexy-react/main/static/media/welcome-bg-2x-svg.25338f53.svg')",
+          "url('https://cdnb.artstation.com/p/assets/images/images/033/804/377/large/lesia-5.jpg?1610610743')",
       },
     },
   },
