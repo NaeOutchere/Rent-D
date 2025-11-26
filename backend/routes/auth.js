@@ -1,36 +1,25 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
 const User = require("../models/User");
-const { expressValidator, validationResult } = require("express-validator");
 
 const router = express.Router();
 
 // Input validation
 const validateRegistration = [
-  expressValidator.body("name").notEmpty().withMessage("Name is required"),
-  expressValidator
-    .body("email")
-    .isEmail()
-    .withMessage("Valid email is required"),
-  expressValidator
-    .body("password")
+  body("name").notEmpty().withMessage("Name is required"),
+  body("email").isEmail().withMessage("Valid email is required"),
+  body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
-  expressValidator
-    .body("role")
+  body("role")
     .isIn(["tenant", "landlord", "tech_support", "tech_admin", "admin"])
     .withMessage("Valid role is required"),
 ];
 
 const validateLogin = [
-  expressValidator
-    .body("email")
-    .isEmail()
-    .withMessage("Valid email is required"),
-  expressValidator
-    .body("password")
-    .notEmpty()
-    .withMessage("Password is required"),
+  body("email").isEmail().withMessage("Valid email is required"),
+  body("password").notEmpty().withMessage("Password is required"),
 ];
 
 // Register new user
@@ -139,41 +128,15 @@ router.post("/login", validateLogin, async (req, res) => {
   }
 });
 
-// Get current user
+// Get current user (placeholder - needs auth middleware)
 router.get("/me", async (req, res) => {
   try {
-    // This requires auth middleware - we'll create that next
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
     res.json({
       status: "success",
-      data: { user },
+      message: "This route requires authentication middleware",
     });
   } catch (error) {
     res.status(500).json({ error: "Failed to get user data" });
-  }
-});
-
-// Update user profile
-router.put("/profile", async (req, res) => {
-  try {
-    const { name, phone, avatar } = req.body;
-
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { name, phone, avatar },
-      { new: true, runValidators: true }
-    );
-
-    res.json({
-      status: "success",
-      data: { user },
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Profile update failed" });
   }
 });
 
