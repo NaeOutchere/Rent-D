@@ -126,21 +126,21 @@ Thank you for your payment!
   if (loading) {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center gap-4">
-        <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-gray-200 border-t-main-orange rounded-full animate-spin"></div>
         <p className="text-gray-600">Loading receipts...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2 mb-2">
-            📄 Rent Receipts
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Rent Receipts
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600">
             View and download your paid rent receipts
           </p>
         </div>
@@ -152,7 +152,7 @@ Thank you for your payment!
         )}
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             {/* Search */}
             <div className="relative">
@@ -164,7 +164,7 @@ Thank you for your payment!
                 placeholder="Search by period or receipt number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main-orange focus:border-main-orange outline-none transition-all"
               />
             </div>
 
@@ -176,7 +176,7 @@ Thank you for your payment!
               <select
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main-orange focus:border-main-orange outline-none appearance-none bg-white"
               >
                 <option value="">All Years</option>
                 {years.map((year) => (
@@ -196,7 +196,7 @@ Thank you for your payment!
 
         {/* Receipts List */}
         {filteredReceipts.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
             <div className="text-6xl mb-4">📄</div>
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
               No receipts found
@@ -212,7 +212,7 @@ Thank you for your payment!
             {filteredReceipts.map((receipt) => (
               <div
                 key={receipt.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-gray-300 transition-all duration-300 flex flex-col"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300 flex flex-col"
               >
                 {/* Receipt Header */}
                 <div className="flex justify-between items-start mb-4">
@@ -244,7 +244,7 @@ Thank you for your payment!
                     <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                       Amount Paid
                     </label>
-                    <p className="text-blue-600 text-2xl font-bold">
+                    <p className="text-main-orange text-2xl font-bold">
                       ${receipt.amount.toLocaleString()}
                     </p>
                   </div>
@@ -281,7 +281,7 @@ Thank you for your payment!
 
                   <button
                     onClick={() => generateReceiptPDF(receipt)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg"
+                    className="flex-1 bg-main-orange hover:bg-orange-600 text-white py-2.5 px-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg"
                   >
                     <span>⬇</span>
                     Download
