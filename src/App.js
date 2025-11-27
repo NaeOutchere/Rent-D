@@ -94,7 +94,7 @@ const AppContent = () => {
           }
         />
         <Route
-          path="/forgotpassword"
+          path="/forgot-password"
           element={
             <PublicRoute>
               <ForgotPassword />
@@ -156,7 +156,7 @@ const AppContent = () => {
               }
             />
             <Route
-              path="/forgotpassword"
+              path="/forgot-password"
               element={
                 <PublicRoute>
                   <ForgotPassword />
