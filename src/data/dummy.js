@@ -471,82 +471,94 @@ export const employeesGrid = [
 
 export const links = [
   {
-    title: 'Home',
+    title: "Home",
     links: [
       {
-        name: 'Dashboard',
+        name: "Dashboard",
         icon: <RiDashboardLine />,
+        link: "/dashboard", // Add this if not already there
       },
     ],
   },
 
   {
-    title: 'Pages',
+    title: "Pages",
     links: [
       {
-        name: 'Rent Receipts',
+        name: "Rent Receipts",
         icon: <BiReceipt />,
+        link: "/rentreceipts", // ADD THIS LINE
       },
       {
-        name: 'Rentees',
+        name: "Rentees",
         icon: <BsFillPeopleFill />,
+        link: "/rentees", // Add this if not already there
       },
       {
-        name: 'Properties',
+        name: "Properties",
         icon: <BsBuilding />,
+        link: "/properties", // Add this if not already there
       },
       {
-        name: 'Customers',
+        name: "Customers",
         icon: <IoIosPeople />,
+        link: "/customers", // Add this if not already there
       },
       {
-        name: 'Admins',
+        name: "Admins",
         icon: <IoMdContacts />,
+        link: "/admins", // Add this if not already there
       },
     ],
   },
   {
-    title: 'Apps',
+    title: "Apps",
     links: [
       {
-        name: 'Calendar',
+        name: "Calendar",
         icon: <AiOutlineCalendar />,
+        link: "/calendar", // Add this if not already there
       },
       {
-        name: 'Kanban',
+        name: "Kanban",
         icon: <BsKanban />,
+        link: "/kanban", // Add this if not already there
       },
       {
-        name: 'Chat',
+        name: "Chat",
         icon: <IoIosChatbubbles />,
+        link: "/chat", // Add this if not already there
       },
       {
-        name: 'Messages',
+        name: "Messages",
         icon: <TiMessages />,
+        link: "/messages", // Add this if not already there
       },
       {
-        name: 'FAQ',
+        name: "FAQ",
         icon: <FaQuestionCircle />,
+        link: "/faq", // Add this if not already there
       },
     ],
   },
   {
-    title: 'Reports',
+    title: "Reports",
     links: [
       {
-        name: 'Weekly',
+        name: "Weekly",
         icon: <AiOutlineStock />,
+        link: "/weekly", // Add this if not already there
       },
       {
-        name: 'Monthly',
+        name: "Monthly",
         icon: <AiOutlineAreaChart />,
+        link: "/monthly", // Add this if not already there
       },
-
       {
-        name: 'Yearly',
+        name: "Yearly",
         icon: <AiOutlineBarChart />,
+        link: "/yearly", // Add this if not already there
       },
-      
     ],
   },
 ];

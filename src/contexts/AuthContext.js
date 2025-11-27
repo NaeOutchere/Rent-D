@@ -20,6 +20,11 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login(email, password);
       const { token, data } = response;
 
+      console.log("=== AUTH CONTEXT DEBUG ===");
+      console.log("Full API response:", response);
+      console.log("User data from API:", data.user);
+      console.log("User role:", data.user?.role);
+
       localStorage.setItem("token", token);
       setToken(token);
       setUser(data.user);
