@@ -20,10 +20,26 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login(email, password);
       const { token, data } = response;
 
-      console.log("=== AUTH CONTEXT DEBUG ===");
-      console.log("Full API response:", response);
-      console.log("User data from API:", data.user);
+      console.log("=== REGULAR LOGIN SUCCESS ===");
       console.log("User role:", data.user?.role);
+
+      localStorage.setItem("token", token);
+      setToken(token);
+      setUser(data.user);
+
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const staffLogin = async (email, password) => {
+    try {
+      const response = await authAPI.staffLogin(email, password);
+      const { token, data } = response;
+
+      console.log("=== STAFF LOGIN SUCCESS ===");
+      console.log("Staff role:", data.user?.role);
 
       localStorage.setItem("token", token);
       setToken(token);
@@ -60,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     login,
+    staffLogin,
     register,
     logout,
     isAuthenticated: !!token,

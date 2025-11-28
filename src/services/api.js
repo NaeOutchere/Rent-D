@@ -14,14 +14,45 @@ export const authAPI = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || `Login failed: ${response.status}`);
+      throw new Error(
+        errorData.error ||
+          errorData.message ||
+          `Login failed: ${response.status}`
+      );
+    }
+
+    return response.json();
+  },
+
+  staffLogin: async (email, password) => {
+    const response = await fetch(`${API_BASE_URL}/auth/staff-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error ||
+          errorData.message ||
+          `Staff login failed: ${response.status}`
+      );
     }
 
     return response.json();
   },
 
   register: async (userData) => {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    // Determine the endpoint based on role
+    const endpoint =
+      userData.role === "landlord"
+        ? "/auth/register/landlord"
+        : "/auth/register/tenant";
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +63,9 @@ export const authAPI = {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.message || `Registration failed: ${response.status}`
+        errorData.error ||
+          errorData.message ||
+          `Registration failed: ${response.status}`
       );
     }
 
