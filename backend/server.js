@@ -23,10 +23,14 @@ app.get("/", (req, res) => {
 // Import routes
 const authRoutes = require("./routes/auth");
 const authDetailedRoutes = require("./routes/auth-detailed"); // ← ADD THIS LINE
+const propertyRoutes = require("./routes/properties");
+
 
 // Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", authDetailedRoutes); // ← ADD THIS LINE
+app.use("/api/properties", propertyRoutes);
+
 
 // Database connection
 mongoose
