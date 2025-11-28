@@ -28,9 +28,9 @@ import {
 
 // Import the new pages
 import Account from "./pages/Account";
-import Wallet from "./pages/Wallet";
+/* import Wallet from "./pages/Wallet";
 import Settings from "./pages/Settings";
-import Documents from "./pages/Documents";
+import Documents from "./pages/Documents"; */
 
 import { ContextProvider, useStateContext } from "./contexts/ContextProvider";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
@@ -201,7 +201,7 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/wallet"
               element={
                 <ProtectedRoute>
@@ -224,7 +224,7 @@ const AppContent = () => {
                   <Documents />
                 </ProtectedRoute>
               }
-            />
+            /> */}
 
             {/* All other routes are protected */}
             <Route

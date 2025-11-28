@@ -20,9 +20,9 @@ const UserProfile = () => {
 
   const menuItems = [
     { label: "Account", icon: "👤", path: "/account" },
-    { label: "Wallet", icon: "💳", path: "/wallet" },
-    { label: "Settings", icon: "⚙️", path: "/settings" },
-    { label: "Documents", icon: "📄", path: "/documents" },
+    // { label: "Wallet", icon: "💳", path: "/wallet" },
+    // { label: "Settings", icon: "⚙️", path: "/settings" },
+    // { label: "Documents", icon: "📄", path: "/documents" },
     { label: "Logout", icon: "🚪", action: logout, isLast: true },
   ];
 

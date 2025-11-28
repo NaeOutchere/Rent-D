@@ -29,6 +29,160 @@ const Kanban = () => {
     attachments: [],
   });
 
+  // Modern SVG Icons
+  const Icons = {
+    board: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+        />
+      </svg>
+    ),
+    ticket: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+        />
+      </svg>
+    ),
+    search: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+    ),
+    add: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 4v16m8-8H4"
+        />
+      </svg>
+    ),
+    filter: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
+        />
+      </svg>
+    ),
+    user: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    ),
+    calendar: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        />
+      </svg>
+    ),
+    edit: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+        />
+      </svg>
+    ),
+    delete: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
+      </svg>
+    ),
+    comment: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+        />
+      </svg>
+    ),
+  };
+
   // Sample data
   const sampleUsers = [
     {
@@ -37,7 +191,7 @@ const Kanban = () => {
       role: "ceo",
       department: "Executive",
       avatar: "JD",
-      color: "#EF4444",
+      color: "#2b4354",
     },
     {
       id: 2,
@@ -45,7 +199,7 @@ const Kanban = () => {
       role: "cto",
       department: "Technology",
       avatar: "JS",
-      color: "#10B981",
+      color: "#2b4354",
     },
     {
       id: 3,
@@ -53,7 +207,7 @@ const Kanban = () => {
       role: "developer",
       department: "Development",
       avatar: "MJ",
-      color: "#8B5CF6",
+      color: "#2b4354",
     },
     {
       id: 4,
@@ -61,7 +215,7 @@ const Kanban = () => {
       role: "designer",
       department: "Design",
       avatar: "SW",
-      color: "#F59E0B",
+      color: "#2b4354",
     },
     {
       id: 5,
@@ -69,7 +223,7 @@ const Kanban = () => {
       role: "admin",
       department: "Operations",
       avatar: "DB",
-      color: "#06B6D4",
+      color: "#2b4354",
     },
     {
       id: 6,
@@ -77,7 +231,7 @@ const Kanban = () => {
       role: "support",
       department: "Support",
       avatar: "EC",
-      color: "#F97316",
+      color: "#2b4354",
     },
     {
       id: 7,
@@ -85,7 +239,7 @@ const Kanban = () => {
       role: "developer",
       department: "Development",
       avatar: "AR",
-      color: "#EC4899",
+      color: "#2b4354",
     },
   ];
 
@@ -125,9 +279,10 @@ const Kanban = () => {
   const sampleTickets = [
     {
       id: "CS-001",
-      title: "Payment processing failed for customer",
+      title:
+        "Payment processing failed for customer with multiple subscription services and recurring billing",
       description:
-        "Customer reports payment failure with error code 500. Need immediate attention as this affects multiple users.",
+        "Customer reports payment failure with error code 500. Need immediate attention as this affects multiple users across different subscription tiers and payment methods.",
       priority: "high",
       type: "issue",
       status: "in-progress",
@@ -137,28 +292,28 @@ const Kanban = () => {
       dueDate: "2024-02-15",
       createdAt: new Date("2024-02-10"),
       updatedAt: new Date("2024-02-12"),
-      tags: ["payment", "urgent", "backend"],
+      tags: ["payment", "urgent", "backend", "subscription", "billing"],
       attachments: ["error_logs.txt"],
       comments: [
         {
           id: 1,
           userId: 6,
-          text: "Investigating the payment gateway integration",
+          text: "Investigating the payment gateway integration and API responses from multiple providers",
           timestamp: new Date("2024-02-10 10:30:00"),
         },
         {
           id: 2,
           userId: 2,
-          text: "Check the API response from Stripe",
+          text: "Check the API response from Stripe and PayPal integration endpoints",
           timestamp: new Date("2024-02-10 11:15:00"),
         },
       ],
     },
     {
       id: "TI-001",
-      title: "Mobile app crashes on iOS 17",
+      title: "Mobile app crashes on iOS 17 with specific user configurations",
       description:
-        "App crashes immediately after launch on iOS 17.2. Stack trace points to memory allocation issue.",
+        "App crashes immediately after launch on iOS 17.2. Stack trace points to memory allocation issue in the authentication module when users have multiple accounts linked.",
       priority: "critical",
       type: "bug",
       status: "todo",
@@ -168,15 +323,15 @@ const Kanban = () => {
       dueDate: "2024-02-20",
       createdAt: new Date("2024-02-11"),
       updatedAt: new Date("2024-02-11"),
-      tags: ["ios", "mobile", "crash"],
+      tags: ["ios", "mobile", "crash", "authentication", "memory"],
       attachments: ["crash_report.ips"],
       comments: [],
     },
     {
       id: "FR-001",
-      title: "Dark mode implementation",
+      title: "Dark mode implementation with system-level theme detection",
       description:
-        "Users requesting dark mode theme for better nighttime usage.",
+        "Users requesting dark mode theme for better nighttime usage with automatic detection of system theme preferences and smooth transitions between light and dark modes.",
       priority: "low",
       type: "enhancement",
       status: "under-review",
@@ -186,22 +341,23 @@ const Kanban = () => {
       dueDate: "2024-03-01",
       createdAt: new Date("2024-02-01"),
       updatedAt: new Date("2024-02-05"),
-      tags: ["ui", "feature", "design"],
+      tags: ["ui", "feature", "design", "accessibility", "theme"],
       attachments: ["design_mockup.pdf"],
       comments: [
         {
           id: 1,
           userId: 4,
-          text: "Initial design mockups ready for review",
+          text: "Initial design mockups ready for review including color schemes and transition animations",
           timestamp: new Date("2024-02-05 14:20:00"),
         },
       ],
     },
     {
       id: "CS-002",
-      title: "Password reset not working",
+      title:
+        "Password reset not working for enterprise accounts with 2FA enabled",
       description:
-        "Customer cannot reset password - reset email never arrives.",
+        "Customer cannot reset password - reset email never arrives. Issue seems to affect only enterprise accounts with two-factor authentication enabled and custom domain emails.",
       priority: "medium",
       type: "issue",
       status: "backlog",
@@ -211,14 +367,16 @@ const Kanban = () => {
       dueDate: "2024-02-25",
       createdAt: new Date("2024-02-12"),
       updatedAt: new Date("2024-02-12"),
-      tags: ["authentication", "email"],
+      tags: ["authentication", "email", "enterprise", "2fa", "security"],
       attachments: [],
       comments: [],
     },
     {
       id: "TI-002",
-      title: "Database connection timeout",
-      description: "Random database connection timeouts during peak hours.",
+      title:
+        "Database connection timeout during peak traffic hours with concurrent users",
+      description:
+        "Random database connection timeouts during peak hours when concurrent user count exceeds 10,000. Issue affects read replicas and connection pooling.",
       priority: "high",
       type: "bug",
       status: "in-progress",
@@ -228,19 +386,25 @@ const Kanban = () => {
       dueDate: "2024-02-18",
       createdAt: new Date("2024-02-08"),
       updatedAt: new Date("2024-02-12"),
-      tags: ["database", "performance", "backend"],
+      tags: [
+        "database",
+        "performance",
+        "backend",
+        "scaling",
+        "connection-pool",
+      ],
       attachments: ["db_logs.sql"],
       comments: [
         {
           id: 1,
           userId: 7,
-          text: "Monitoring connection pool settings",
+          text: "Monitoring connection pool settings and database performance metrics during peak load",
           timestamp: new Date("2024-02-09 09:45:00"),
         },
         {
           id: 2,
           userId: 2,
-          text: "Consider increasing connection timeout limit",
+          text: "Consider increasing connection timeout limit and optimizing query performance for high-traffic endpoints",
           timestamp: new Date("2024-02-10 16:20:00"),
         },
       ],
@@ -263,7 +427,7 @@ const Kanban = () => {
       name: newBoardName,
       description: newBoardDescription,
       columns: ["backlog", "todo", "in-progress", "done"],
-      color: "#6B7280",
+      color: "#2b4354",
       icon: "📋",
     };
 
@@ -484,33 +648,28 @@ const Kanban = () => {
       <div
         draggable
         onDragStart={(e) => handleDragStart(e, ticket.id)}
-        className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 cursor-move mb-3"
+        className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all p-4 cursor-move mb-3 group break-words"
       >
-        <div className="flex justify-between items-start mb-2">
-          <span className="text-sm font-mono text-gray-500">{ticket.id}</span>
-          <div className="flex space-x-1">
+        <div className="flex justify-between items-start mb-3 gap-2">
+          <span className="text-sm font-mono text-gray-500 font-medium flex-shrink-0">
+            {ticket.id}
+          </span>
+          <div className="flex space-x-2 flex-shrink-0">
             <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
+              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
                 ticket.priority
               )}`}
             >
               {ticket.priority}
             </span>
-            <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getTypeColor(
-                ticket.type
-              )}`}
-            >
-              {ticket.type}
-            </span>
           </div>
         </div>
 
-        <h4 className="font-semibold text-gray-900 mb-2 text-sm leading-tight">
+        <h4 className="font-semibold text-gray-900 mb-2 text-sm leading-tight break-words">
           {ticket.title}
         </h4>
 
-        <p className="text-gray-600 text-xs mb-3 line-clamp-2">
+        <p className="text-gray-600 text-xs mb-3 line-clamp-3 break-words leading-relaxed">
           {ticket.description}
         </p>
 
@@ -519,7 +678,7 @@ const Kanban = () => {
             {ticket.tags.map((tag, index) => (
               <span
                 key={index}
-                className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-lg break-words max-w-full"
               >
                 #{tag}
               </span>
@@ -527,52 +686,64 @@ const Kanban = () => {
           </div>
         )}
 
-        <div className="flex justify-between items-center text-xs text-gray-500">
-          <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs text-gray-500 mb-3">
+          <div className="flex items-center space-x-2 min-w-0">
             {assignee ? (
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-2 min-w-0">
                 <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0"
                   style={{ backgroundColor: assignee.color }}
                 >
                   {assignee.avatar}
                 </div>
-                <span>{assignee.name.split(" ")[0]}</span>
+                <span className="font-medium truncate">
+                  {assignee.name.split(" ")[0]}
+                </span>
               </div>
             ) : (
-              <span className="text-gray-400">Unassigned</span>
+              <div className="flex items-center space-x-2 text-gray-400 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                  {Icons.user}
+                </div>
+                <span className="truncate">Unassigned</span>
+              </div>
             )}
           </div>
 
           {ticket.dueDate && (
-            <span
-              className={
+            <div
+              className={`flex items-center space-x-1 px-2 py-1 rounded-lg flex-shrink-0 ${
                 new Date(ticket.dueDate) < new Date()
-                  ? "text-red-500 font-medium"
-                  : ""
-              }
+                  ? "bg-red-100 text-red-700"
+                  : "bg-gray-100 text-gray-700"
+              }`}
             >
-              {formatDate(ticket.dueDate)}
-            </span>
+              {Icons.calendar}
+              <span className="font-medium whitespace-nowrap">
+                {formatDate(ticket.dueDate)}
+              </span>
+            </div>
           )}
         </div>
 
-        <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
-          <span className="text-xs text-gray-400">
-            {formatDate(ticket.updatedAt)}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pt-3 border-t border-gray-100">
+          <span className="text-xs text-gray-400 whitespace-nowrap">
+            Updated {formatDate(ticket.updatedAt)}
           </span>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
             <button
               onClick={() => setEditingTicket(ticket)}
-              className="text-blue-500 hover:text-blue-700 text-xs"
+              className="text-[#2b4354] hover:text-orange-500 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              title="Edit ticket"
             >
-              Edit
+              {Icons.edit}
             </button>
             <button
               onClick={() => handleDeleteTicket(ticket.id)}
-              className="text-red-500 hover:text-red-700 text-xs"
+              className="text-red-500 hover:text-red-700 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              title="Delete ticket"
             >
-              Delete
+              {Icons.delete}
             </button>
           </div>
         </div>
@@ -586,17 +757,20 @@ const Kanban = () => {
     const isEditing = !!editingTicket;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-900">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm overflow-y-auto">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-8 mx-auto">
+          <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-[#2b4354] to-[#3c5a6a]">
+            <h3 className="text-xl font-semibold text-white break-words">
               {isEditing ? "Edit Ticket" : "Create New Ticket"}
             </h3>
+            <p className="text-blue-100 mt-1 break-words">
+              {getBoardById(activeBoard)?.name} Board
+            </p>
           </div>
 
           <form
             onSubmit={isEditing ? handleUpdateTicket : handleCreateTicket}
-            className="p-6 overflow-y-auto max-h-[70vh]"
+            className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto"
           >
             <div className="space-y-4">
               <div>
@@ -611,7 +785,7 @@ const Kanban = () => {
                       ? setEditingTicket({ ...ticket, title: e.target.value })
                       : setNewTicket({ ...newTicket, title: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 break-words"
                   placeholder="Enter ticket title..."
                   required
                 />
@@ -635,12 +809,12 @@ const Kanban = () => {
                         })
                   }
                   rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 break-words resize-none"
                   placeholder="Describe the issue or request..."
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Priority
@@ -658,7 +832,7 @@ const Kanban = () => {
                             priority: e.target.value,
                           })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -678,7 +852,7 @@ const Kanban = () => {
                         ? setEditingTicket({ ...ticket, type: e.target.value })
                         : setNewTicket({ ...newTicket, type: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50"
                   >
                     <option value="bug">Bug</option>
                     <option value="issue">Issue</option>
@@ -688,7 +862,7 @@ const Kanban = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Assignee
@@ -710,7 +884,7 @@ const Kanban = () => {
                               : "",
                           })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50"
                   >
                     <option value="">Unassigned</option>
                     {sampleUsers.map((user) => (
@@ -739,7 +913,7 @@ const Kanban = () => {
                             dueDate: e.target.value,
                           })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50"
                   />
                 </div>
               </div>
@@ -749,21 +923,34 @@ const Kanban = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Comments
                   </label>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <div className="space-y-3 max-h-32 overflow-y-auto">
                     {ticket.comments.map((comment) => (
                       <div
                         key={comment.id}
-                        className="bg-gray-50 rounded-lg p-3"
+                        className="bg-gray-50 rounded-2xl p-4 border border-gray-200 break-words"
                       >
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="font-medium text-sm">
-                            {getUserById(comment.userId)?.name}
-                          </span>
-                          <span className="text-xs text-gray-500">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                          <div className="flex items-center space-x-2 min-w-0">
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                              style={{
+                                backgroundColor: getUserById(comment.userId)
+                                  ?.color,
+                              }}
+                            >
+                              {getUserById(comment.userId)?.avatar}
+                            </div>
+                            <span className="font-medium text-sm truncate">
+                              {getUserById(comment.userId)?.name}
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
                             {formatDate(comment.timestamp)}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-700">{comment.text}</p>
+                        <p className="text-sm text-gray-700 break-words">
+                          {comment.text}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -775,11 +962,11 @@ const Kanban = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Add Comment
                   </label>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <input
                       type="text"
                       id="new-comment"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 break-words"
                       placeholder="Add a comment..."
                     />
                     <button
@@ -791,28 +978,29 @@ const Kanban = () => {
                           input.value = "";
                         }
                       }}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                      className="px-6 py-3 bg-gradient-to-r from-[#2b4354] to-[#3c5a6a] text-white rounded-2xl hover:shadow-lg transition-all font-medium flex items-center justify-center space-x-2 whitespace-nowrap"
                     >
-                      Add
+                      {Icons.comment}
+                      <span>Add</span>
                     </button>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-6 pt-6 border-t border-gray-200">
               <button
                 type="button"
                 onClick={() =>
                   isEditing ? setEditingTicket(null) : setShowTicketModal(false)
                 }
-                className="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                className="px-6 py-3 text-gray-700 bg-gray-100 rounded-2xl hover:bg-gray-200 transition-all font-medium w-full sm:w-auto"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl hover:shadow-lg transition-all font-medium w-full sm:w-auto"
               >
                 {isEditing ? "Update Ticket" : "Create Ticket"}
               </button>
@@ -824,47 +1012,66 @@ const Kanban = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 overflow-x-hidden">
       {/* Header */}
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Kanban Boards</h1>
-            <p className="text-gray-600 mt-2">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-8">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
+              Kanban Boards
+            </h1>
+            <p className="text-gray-600 mt-2 break-words">
               Manage customer service tickets and technical issues
             </p>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
             <button
               onClick={() => setShowBoardModal(true)}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              className="px-4 sm:px-6 py-3 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-all font-medium flex items-center justify-center space-x-2 shadow-sm"
             >
-              New Board
+              {Icons.board}
+              <span className="whitespace-nowrap">New Board</span>
             </button>
             <button
               onClick={() => setShowTicketModal(true)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+              className="px-4 sm:px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl hover:shadow-lg transition-all font-medium flex items-center justify-center space-x-2 shadow-sm"
             >
-              New Ticket
+              {Icons.ticket}
+              <span className="whitespace-nowrap">New Ticket</span>
             </button>
           </div>
         </div>
 
         {/* Board Selection */}
-        <div className="flex space-x-2 mb-6 overflow-x-auto pb-2">
+        <div className="flex overflow-x-auto pb-4 mb-6 gap-3 scrollbar-hide">
           {boards.map((board) => (
             <button
               key={board.id}
               onClick={() => setActiveBoard(board.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+              className={`flex items-center space-x-3 px-4 sm:px-6 py-4 rounded-2xl transition-all whitespace-nowrap min-w-[280px] flex-shrink-0 ${
                 activeBoard === board.id
-                  ? "bg-white shadow-sm border border-gray-200"
-                  : "bg-gray-100 hover:bg-gray-200"
+                  ? "bg-gradient-to-r from-[#2b4354] to-[#3c5a6a] text-white shadow-lg"
+                  : "bg-white text-gray-700 hover:shadow-lg border border-gray-200"
               }`}
             >
-              <span className="text-lg">{board.icon}</span>
-              <span className="font-medium">{board.name}</span>
-              <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+              <span className="text-2xl flex-shrink-0">{board.icon}</span>
+              <div className="flex-1 text-left min-w-0">
+                <div className="font-semibold truncate">{board.name}</div>
+                <div
+                  className={`text-sm truncate ${
+                    activeBoard === board.id ? "text-blue-100" : "text-gray-500"
+                  }`}
+                >
+                  {board.description}
+                </div>
+              </div>
+              <span
+                className={`text-sm px-3 py-1 rounded-full flex-shrink-0 ${
+                  activeBoard === board.id
+                    ? "bg-white text-[#2b4354]"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
                 {tickets.filter((t) => t.boardId === board.id).length}
               </span>
             </button>
@@ -872,79 +1079,91 @@ const Kanban = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex-1 min-w-64">
-              <input
-                type="text"
-                placeholder="Search tickets..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+            <div className="flex-1 w-full lg:min-w-64">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search tickets..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 break-words"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  {Icons.search}
+                </div>
+              </div>
             </div>
-            <select
-              value={filterPriority}
-              onChange={(e) => setFilterPriority(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Priorities</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="critical">Critical</option>
-            </select>
-            <select
-              value={filterAssignee}
-              onChange={(e) => setFilterAssignee(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Assignees</option>
-              {sampleUsers.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Statuses</option>
-              {getColumnHeaders().map((column) => (
-                <option key={column} value={column}>
-                  {getColumnTitle(column)}
-                </option>
-              ))}
-            </select>
+            <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+              <div className="text-gray-400 hidden sm:block">
+                {Icons.filter}
+              </div>
+              <select
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value)}
+                className="flex-1 lg:flex-none px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 min-w-[140px]"
+              >
+                <option value="all">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+              <select
+                value={filterAssignee}
+                onChange={(e) => setFilterAssignee(e.target.value)}
+                className="flex-1 lg:flex-none px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 min-w-[140px]"
+              >
+                <option value="all">All Assignees</option>
+                {sampleUsers.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="flex-1 lg:flex-none px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 min-w-[140px]"
+              >
+                <option value="all">All Statuses</option>
+                {getColumnHeaders().map((column) => (
+                  <option key={column} value={column}>
+                    {getColumnTitle(column)}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Kanban Board */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
           {getColumnHeaders().map((column) => (
             <div
               key={column}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, column)}
-              className="bg-gray-100 rounded-lg p-4 min-h-[600px]"
+              className="bg-gray-100 rounded-2xl p-4 sm:p-6 min-h-[500px]"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-gray-700">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 className="font-semibold text-gray-700 text-base sm:text-lg break-words">
                   {getColumnTitle(column)}
                 </h3>
-                <span className="bg-white text-gray-600 text-sm px-2 py-1 rounded-full">
+                <span className="bg-white text-gray-600 text-sm px-2 sm:px-3 py-1 rounded-full font-medium shadow-sm flex-shrink-0">
                   {getTicketsByStatus(column).length}
                 </span>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 sm:space-y-4">
                 {getTicketsByStatus(column).map((ticket) => (
                   <TicketCard key={ticket.id} ticket={ticket} />
                 ))}
                 {getTicketsByStatus(column).length === 0 && (
-                  <div className="text-center py-8 text-gray-400">
-                    <p>No tickets</p>
+                  <div className="text-center py-8 sm:py-12 text-gray-400">
+                    <div className="text-3xl sm:text-4xl mb-2">📋</div>
+                    <p className="text-sm sm:text-base">No tickets</p>
+                    <p className="text-xs sm:text-sm mt-1">Drag tickets here</p>
                   </div>
                 )}
               </div>
@@ -958,10 +1177,10 @@ const Kanban = () => {
 
       {/* Board Creation Modal */}
       {showBoardModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md my-8 mx-auto">
+            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-[#2b4354] to-[#3c5a6a]">
+              <h3 className="text-xl font-semibold text-white break-words">
                 Create New Board
               </h3>
             </div>
@@ -975,7 +1194,7 @@ const Kanban = () => {
                     type="text"
                     value={newBoardName}
                     onChange={(e) => setNewBoardName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 break-words"
                     placeholder="e.g., Marketing, Operations"
                     required
                   />
@@ -988,22 +1207,22 @@ const Kanban = () => {
                     value={newBoardDescription}
                     onChange={(e) => setNewBoardDescription(e.target.value)}
                     rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 break-words resize-none"
                     placeholder="What's this board for?"
                   />
                 </div>
               </div>
-              <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-6 pt-6 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setShowBoardModal(false)}
-                  className="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                  className="px-6 py-3 text-gray-700 bg-gray-100 rounded-2xl hover:bg-gray-200 transition-all font-medium w-full sm:w-auto"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                  className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl hover:shadow-lg transition-all font-medium w-full sm:w-auto"
                 >
                   Create Board
                 </button>
