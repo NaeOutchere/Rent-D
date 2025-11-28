@@ -26,6 +26,12 @@ import {
   Signup,
 } from "./pages";
 
+// Import the new pages
+import Account from "./pages/Account";
+import Wallet from "./pages/Wallet";
+import Settings from "./pages/Settings";
+import Documents from "./pages/Documents";
+
 import { ContextProvider, useStateContext } from "./contexts/ContextProvider";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
@@ -182,6 +188,40 @@ const AppContent = () => {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* User Profile Pages */}
+            <Route
+              path="/account"
+              element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wallet"
+              element={
+                <ProtectedRoute>
+                  <Wallet />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/documents"
+              element={
+                <ProtectedRoute>
+                  <Documents />
                 </ProtectedRoute>
               }
             />

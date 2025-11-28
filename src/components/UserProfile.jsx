@@ -1,28 +1,39 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import avatar from "../data/Denae.png"; // Add this import
+import avatar from "../data/Denae.png";
 
 const UserProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleMenuItemClick = (item) => {
+    if (item.action) {
+      item.action();
+    } else if (item.path) {
+      navigate(item.path);
+    }
+    setIsOpen(false);
+  };
 
   const menuItems = [
-    { label: "Account", icon: "👤" },
-    { label: "Payment", icon: "💳" },
-    { label: "Settings", icon: "⚙️" },
-    { label: "Documents", icon: "📄" },
+    { label: "Account", icon: "👤", path: "/account" },
+    { label: "Wallet", icon: "💳", path: "/wallet" },
+    { label: "Settings", icon: "⚙️", path: "/settings" },
+    { label: "Documents", icon: "📄", path: "/documents" },
     { label: "Logout", icon: "🚪", action: logout, isLast: true },
   ];
 
   return (
     <div className="relative">
-      {/* User Avatar/Button - Using your original styling */}
+      {/* User Avatar/Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
       >
-        <img className="rounded-full w-8 h-8" src={avatar} />
+        <img className="rounded-full w-8 h-8" src={avatar} alt="User avatar" />
         <p>
           <span className="text-gray-400 text-14">Hi, </span>{" "}
           <span className="text-gray-400 font-bold ml-1 text-14">
@@ -47,15 +58,10 @@ const UserProfile = () => {
 
           {/* Menu Items */}
           <div className="py-1">
-            {menuItems.map((item, index) => (
+            {menuItems.map((item) => (
               <button
                 key={item.label}
-                onClick={() => {
-                  if (item.action) {
-                    item.action();
-                  }
-                  setIsOpen(false);
-                }}
+                onClick={() => handleMenuItemClick(item)}
                 className={`w-full text-left px-4 py-2 text-sm flex items-center gap-3 transition duration-200 ${
                   item.isLast
                     ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400"
