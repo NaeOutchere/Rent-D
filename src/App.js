@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { FiSettings } from "react-icons/fi";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
@@ -28,16 +28,17 @@ import {
 
 // Import the new pages
 import Account from "./pages/Account";
-/* import Wallet from "./pages/Wallet";
-import Settings from "./pages/Settings";
-import Documents from "./pages/Documents"; */
+
+// Import the maintenance components (make sure these files exist)
+import MaintenanceServices from "./pages/MaintenanceServices";
+import LandlordServiceManagement from "./pages/LandlordServiceManagement";
 
 import { ContextProvider, useStateContext } from "./contexts/ContextProvider";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 import "./App.css";
 
-// Protected Route Component using AuthContext
+// Protected Route Component - FIXED VERSION
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -49,10 +50,10 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-// Public Route Component using AuthContext
+// Public Route Component - FIXED VERSION
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -64,51 +65,19 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  return !isAuthenticated ? children : <Navigate to="/dashboard" />;
+  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
 const AppContent = () => {
   const { activeMenu } = useStateContext();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
+  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl">Loading...</div>
       </div>
-    );
-  }
-
-  // If not authenticated, only show auth pages
-  if (!isAuthenticated) {
-    return (
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <Signup />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <ForgotPassword />
-            </PublicRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
     );
   }
 
@@ -125,26 +94,37 @@ const AppContent = () => {
           </button>
         </TooltipComponent>
       </div>
-      {activeMenu ? (
-        <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white">
-          <Sidebar />
-        </div>
-      ) : (
-        <div className="w-0 dark:bg-secondary-dark-bg">
-          <Sidebar />
-        </div>
+
+      {/* Only show sidebar if authenticated */}
+      {isAuthenticated && (
+        <>
+          {activeMenu ? (
+            <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white">
+              <Sidebar />
+            </div>
+          ) : (
+            <div className="w-0 dark:bg-secondary-dark-bg">
+              <Sidebar />
+            </div>
+          )}
+        </>
       )}
+
       <div
-        className={`dark:bg-main-bg bg-main-bg min-h-screen
-                    w-full ${activeMenu ? "md:ml-72" : "flex-2"}`}
+        className={`dark:bg-main-bg bg-main-bg min-h-screen w-full ${
+          isAuthenticated && activeMenu ? "md:ml-72" : "flex-2"
+        }`}
       >
-        <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
-          <Navbar />
-        </div>
+        {/* Only show navbar if authenticated */}
+        {isAuthenticated && (
+          <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
+            <Navbar />
+          </div>
+        )}
 
         <div>
           <Routes>
-            {/* Authentication - Public Routes */}
+            {/* Public Routes */}
             <Route
               path="/login"
               element={
@@ -174,15 +154,16 @@ const AppContent = () => {
             <Route path="/error404" element={<Error404 />} />
             <Route path="/error500" element={<Error500 />} />
 
-            {/* Dashboard & Protected Routes */}
+            {/* Protected Routes */}
             <Route
               path="/"
               element={
                 <ProtectedRoute>
-                  <Navigate to="/dashboard" />
+                  <Navigate to="/dashboard" replace />
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/dashboard"
               element={
@@ -192,7 +173,7 @@ const AppContent = () => {
               }
             />
 
-            {/* User Profile Pages */}
+            {/* User Profile */}
             <Route
               path="/account"
               element={
@@ -201,32 +182,27 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
-            {/* <Route
-              path="/wallet"
-              element={
-                <ProtectedRoute>
-                  <Wallet />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/documents"
-              element={
-                <ProtectedRoute>
-                  <Documents />
-                </ProtectedRoute>
-              }
-            /> */}
 
-            {/* All other routes are protected */}
+            {/* Maintenance Services */}
+            <Route
+              path="/maintenance"
+              element={
+                <ProtectedRoute>
+                  <MaintenanceServices />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/service-management"
+              element={
+                <ProtectedRoute>
+                  <LandlordServiceManagement />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Other Protected Routes */}
             <Route
               path="/rentreceipts"
               element={
@@ -333,7 +309,15 @@ const AppContent = () => {
             />
 
             {/* Catch all route */}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to={isAuthenticated ? "/dashboard" : "/login"}
+                  replace
+                />
+              }
+            />
           </Routes>
         </div>
       </div>

@@ -2,73 +2,130 @@
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
+// Helper function for API calls
+const apiRequest = async (endpoint, options = {}) => {
+  const token = localStorage.getItem("token");
+
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  if (config.body && typeof config.body === "object") {
+    config.body = JSON.stringify(config.body);
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error ||
+        errorData.message ||
+        `Request failed: ${response.status}`
+    );
+  }
+
+  return response.json();
+};
+
 export const authAPI = {
   login: async (email, password) => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    return apiRequest("/auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
+      body: { email, password },
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error ||
-          errorData.message ||
-          `Login failed: ${response.status}`
-      );
-    }
-
-    return response.json();
   },
 
   staffLogin: async (email, password) => {
-    const response = await fetch(`${API_BASE_URL}/auth/staff-login`, {
+    return apiRequest("/auth/staff-login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
+      body: { email, password },
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error ||
-          errorData.message ||
-          `Staff login failed: ${response.status}`
-      );
-    }
-
-    return response.json();
   },
 
   register: async (userData) => {
-    // Determine the endpoint based on role
     const endpoint =
       userData.role === "landlord"
         ? "/auth/register/landlord"
         : "/auth/register/tenant";
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    return apiRequest(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
+      body: userData,
     });
+  },
+};
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error ||
-          errorData.message ||
-          `Registration failed: ${response.status}`
-      );
-    }
+// Maintenance Services API
+export const servicesAPI = {
+  // Get service categories
+  getCategories: async () => {
+    return apiRequest("/services/categories");
+  },
 
-    return response.json();
+  // Get service providers for a property
+  getPropertyProviders: async (propertyId) => {
+    return apiRequest(`/services/property/${propertyId}/providers`);
+  },
+
+  // Submit service request
+  submitRequest: async (data) => {
+    return apiRequest("/services/request", {
+      method: "POST",
+      body: data,
+    });
+  },
+
+  // Get service requests for user
+  getRequests: async (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiRequest(`/services/requests?${queryString}`);
+  },
+
+  // Update service request status (landlord only)
+  updateRequestStatus: async (requestId, data) => {
+    return apiRequest(`/services/request/${requestId}/status`, {
+      method: "PATCH",
+      body: data,
+    });
+  },
+
+  // Add service provider to property (landlord only)
+  addProviderToProperty: async (propertyId, data) => {
+    return apiRequest(`/services/property/${propertyId}/providers`, {
+      method: "POST",
+      body: data,
+    });
+  },
+
+  // Get properties for current user
+  getProperties: async () => {
+    return apiRequest("/services/properties");
+  },
+};
+
+// Properties API (if you don't have one already)
+export const propertiesAPI = {
+  getMyProperties: async () => {
+    return apiRequest("/properties/my-properties");
+  },
+
+  createProperty: async (data) => {
+    return apiRequest("/properties", {
+      method: "POST",
+      body: data,
+    });
+  },
+
+  updateProperty: async (propertyId, data) => {
+    return apiRequest(`/properties/${propertyId}`, {
+      method: "PUT",
+      body: data,
+    });
   },
 };

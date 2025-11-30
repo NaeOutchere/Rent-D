@@ -8,44 +8,48 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Test route
-app.get("/", (req, res) => {
-  res.json({
-    message: "🚀 Rent-D Backend is WORKING with LIVE Database!",
-    database:
-      mongoose.connection.readyState === 1 ? "Connected ✅" : "Disconnected ❌",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Import routes
+// Routes
 const authRoutes = require("./routes/auth");
-const authDetailedRoutes = require("./routes/auth-detailed"); // ← ADD THIS LINE
 const propertyRoutes = require("./routes/properties");
-
+const serviceRoutes = require("./routes/services");
 
 // Use routes
 app.use("/api/auth", authRoutes);
-app.use("/api/auth", authDetailedRoutes); // ← ADD THIS LINE
 app.use("/api/properties", propertyRoutes);
+app.use("/api/services", serviceRoutes);
 
+// Add this route to test if server is running
+app.get("/api/health", (req, res) => {
+  res.json({ status: "Server is running!" });
+});
 
-// Database connection
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("🎉 MongoDB Atlas connected successfully!");
-    console.log("📊 Database: rentd");
-    console.log("🌐 Cloud: MongoDB Atlas");
-  })
-  .catch((err) => {
-    console.log("❌ MongoDB connection failed:", err.message);
-  });
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🎯 Server running on port ${PORT}`);
-  console.log(`📍 Live API: http://localhost:${PORT}`);
-});
+
+mongoose
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/rentd", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
+
+module.exports = app;

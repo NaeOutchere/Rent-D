@@ -30,7 +30,7 @@ const propertySchema = new mongoose.Schema({
 
   tenants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
-  isAvailable: { type: Boolean, default: true }, // already exists
+  isAvailable: { type: Boolean, default: true },
 
   status: {
     type: String,
@@ -46,7 +46,28 @@ const propertySchema = new mongoose.Schema({
     },
   ],
 
+  // Add maintenance service fields
+  maintenanceContact: {
+    name: String,
+    phone: String,
+    email: String,
+  },
+  serviceInstructions: String,
+  emergencyProcedures: String,
+  preferredServiceProviders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ServiceProvider",
+    },
+  ],
+
   createdAt: { type: Date, default: Date.now },
+});
+
+// Virtual for full address
+propertySchema.virtual("fullAddress").get(function () {
+  const addr = this.address;
+  return `${addr.street}, ${addr.city}, ${addr.state} ${addr.zipCode}`;
 });
 
 module.exports = mongoose.model("Property", propertySchema);

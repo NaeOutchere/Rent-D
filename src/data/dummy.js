@@ -4,6 +4,9 @@ import { RiDashboardLine} from 'react-icons/ri';
 import { BsKanban, BsFillPeopleFill, BsBoxSeam, BsCurrencyDollar, BsShield, BsChatLeft, BsBuilding } from 'react-icons/bs';
 import {FiBarChart, FiCreditCard, FiShoppingCart, FiStar} from 'react-icons/fi';
 import { BiReceipt } from 'react-icons/bi';
+
+import { FiTool, FiSettings } from 'react-icons/fi';
+
 import { IoMdContacts, IoIosPeople, IoIosChatbubbles } from 'react-icons/io';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { MdOutlineSupervisorAccount } from 'react-icons/md';
@@ -109,6 +112,7 @@ export const EditorData = () => (
 
       React for Beginners
       If you feel that the React documentation goes at a faster pace than you’re comfortable with, check out this overview of React by Tania Rascia. It introduces the most important React concepts in a detailed, beginner-friendly way. Once you’re done, give the documentation another try!
+import { FiSettings } from 'react-icons/fi';
 
       React for Designers
       If you’re coming from a design background, these resources are a great place to get started.
@@ -490,7 +494,7 @@ export const links = [
         link: "/rentreceipts", // ADD THIS LINE
       },
       {
-        name: "Rentees",
+        name: "Tenants",
         icon: <BsFillPeopleFill />,
         link: "/rentees", // Add this if not already there
       },
@@ -508,6 +512,18 @@ export const links = [
         name: "Admins",
         icon: <IoMdContacts />,
         link: "/admins", // Add this if not already there
+      },
+      {
+        name: "Maintenance Services",
+        icon: <FiTool />,
+        link: "/maintenance",
+        roles: ["tenant"], // Only show to tenants
+      },
+      {
+        name: "Service Management",
+        icon: <FiSettings />,
+        link: "/service-management",
+        roles: ["landlord"], // Only show to landlords
       },
     ],
   },
