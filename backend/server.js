@@ -13,21 +13,28 @@ app.use(express.json());
 const authRoutes = require("./routes/auth");
 const propertyRoutes = require("./routes/properties");
 const serviceRoutes = require("./routes/services");
+const paymentRoutes = require("./routes/payments");
 
 // Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/services", serviceRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Add this route to test if server is running
 app.get("/api/health", (req, res) => {
-  res.json({ status: "Server is running!" });
+  res.json({
+    status: "Server is running!",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
+  res
+    .status(500)
+    .json({ error: "Something went wrong!", details: err.message });
 });
 
 // 404 handler
@@ -37,11 +44,9 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
+// REMOVE DEPRECATED OPTIONS and KEEP ONLY ONE mongoose.connect
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/rentd", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/rentd")
   .then(() => {
     console.log("Connected to MongoDB");
     app.listen(PORT, () => {

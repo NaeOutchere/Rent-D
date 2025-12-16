@@ -112,6 +112,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center dark:bg-main-dark-bg bg-main-bg p-4 relative">
+      {/* // In your Login component, add this button near the staff portal button */}
+      <div className="absolute top-6 left-6">
+        <Link
+          to="/fast-pay"
+          className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+        >
+          <span className="text-sm">⚡</span>
+          <span className="text-sm font-medium">Fast Pay</span>
+        </Link>
+      </div>
       {/* Staff Portal Button - Top Right Corner */}
       <div className="absolute top-6 right-6">
         <button
@@ -122,7 +132,6 @@ const Login = () => {
           <span className="text-sm font-medium">Staff Portal</span>
         </button>
       </div>
-
       <div className="max-w-md w-full">
         {/* Header with Branding */}
         <div className="text-center mb-8">
@@ -280,7 +289,6 @@ const Login = () => {
           </p>
         </div>
       </div>
-
       {/* Staff Login Modal */}
       {showStaffModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -438,7 +446,6 @@ const Login = () => {
           </div>
         </div>
       )}
-
       {/* Overlay to close modal */}
       {showStaffModal && (
         <div

@@ -24,7 +24,12 @@ const referenceSchema = new mongoose.Schema({
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  email: {
+    type: String,
+    required: true,
+    unique: true, // This automatically creates an index
+    index: true,
+  },
   password: { type: String, required: true },
   role: {
     type: String,
@@ -35,6 +40,27 @@ const userSchema = new mongoose.Schema({
   dateOfBirth: Date,
   avatar: String,
   isVerified: { type: Boolean, default: false },
+
+  // ===== FAST PAY FEATURE FIELDS =====
+  tenantId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null/undefined for non-tenants
+    index: true, // This is fine - creates index for tenantId
+  },
+  balanceDue: {
+    type: Number,
+    default: 0,
+  },
+  currentProperty: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Property",
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  // ===================================
 
   // Common fields for both landlords and tenants
   trn: String,
@@ -137,9 +163,28 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
+// Add pre-save hook to generate tenantId for new tenants
 userSchema.pre("save", async function (next) {
+  // Generate tenantId for new tenants
+  if (this.isNew && this.role === "tenant" && !this.tenantId) {
+    // Generate tenantId in format: TEN-YYYYMMDD-XXXX
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const random = Math.floor(1000 + Math.random() * 9000);
+    this.tenantId = `TEN-${year}${month}${day}-${random}`;
+  }
+
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 12);
+
+  // Only hash password if it's not already hashed
+  const isAlreadyHashed =
+    this.password.startsWith("$2a$") || this.password.startsWith("$2b$");
+  if (!isAlreadyHashed) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
+
   this.updatedAt = Date.now();
   next();
 });
@@ -155,15 +200,33 @@ userSchema.methods.correctPassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-/* userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-}; */
-
 userSchema.methods.isTechTeam = function () {
   return this.role === "tech_support" || this.role === "tech_admin";
 };
+
+// Virtual property for displaying formatted balance
+userSchema.virtual("formattedBalanceDue").get(function () {
+  return this.balanceDue ? this.balanceDue.toFixed(2) : "0.00";
+});
+
+// Method to update balance
+userSchema.methods.updateBalance = function (amount, operation = "add") {
+  if (operation === "add") {
+    this.balanceDue += amount;
+  } else if (operation === "subtract") {
+    this.balanceDue = Math.max(0, this.balanceDue - amount);
+  } else if (operation === "set") {
+    this.balanceDue = amount;
+  }
+  return this.save();
+};
+
+// REMOVE OR COMMENT OUT THESE DUPLICATE INDEXES:
+// userSchema.index({ tenantId: 1 }); // DUPLICATE - already created by unique: true
+// userSchema.index({ email: 1 });    // DUPLICATE - already created by unique: true
+
+// Keep these additional indexes:
+userSchema.index({ role: 1, isActive: 1 });
+userSchema.index({ name: "text", email: "text", tenantId: "text" });
 
 module.exports = mongoose.model("User", userSchema);

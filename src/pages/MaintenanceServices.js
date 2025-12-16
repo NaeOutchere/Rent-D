@@ -20,6 +20,7 @@ const MaintenanceServices = () => {
     scheduledDate: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [propertiesLoading, setPropertiesLoading] = useState(true);
 
   useEffect(() => {
     fetchCategories();
@@ -28,10 +29,17 @@ const MaintenanceServices = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedProperty) {
+    if (selectedProperty && isValidObjectId(selectedProperty)) {
       fetchServiceProviders(selectedProperty);
+    } else {
+      setServiceProviders([]);
     }
   }, [selectedProperty]);
+
+  // Helper function to validate MongoDB ObjectId
+  const isValidObjectId = (id) => {
+    return /^[0-9a-fA-F]{24}$/.test(id);
+  };
 
   const fetchCategories = async () => {
     try {
@@ -44,46 +52,117 @@ const MaintenanceServices = () => {
 
   const fetchUserProperties = async () => {
     try {
-      // This would come from your properties API
-      const mockProperties = [
-        { _id: "1", address: "123 Main St, Apt 4B" },
-        { _id: "2", address: "456 Oak Ave, Unit 2" },
-      ];
-      setProperties(mockProperties);
-      if (mockProperties.length > 0) {
-        setSelectedProperty(mockProperties[0]._id);
-        setFormData((prev) => ({ ...prev, propertyId: mockProperties[0]._id }));
+      setPropertiesLoading(true);
+      console.log("Fetching user properties...");
+
+      const response = await fetch(
+        "http://localhost:5000/api/properties/user/my-properties",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Properties API response:", data);
+
+        if (data.properties && data.properties.length > 0) {
+          // Filter out any properties with invalid IDs
+          const validProperties = data.properties.filter(
+            (property) => property._id && isValidObjectId(property._id)
+          );
+
+          if (validProperties.length > 0) {
+            setProperties(validProperties);
+            setSelectedProperty(validProperties[0]._id);
+            setFormData((prev) => ({
+              ...prev,
+              propertyId: validProperties[0]._id,
+            }));
+            console.log("Set valid properties:", validProperties);
+          } else {
+            console.log("No valid properties found");
+            setProperties([]);
+          }
+        } else {
+          console.log("No properties found in response");
+          setProperties([]);
+        }
+      } else {
+        console.error("Failed to fetch properties. Status:", response.status);
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        setProperties([]);
       }
     } catch (error) {
       console.error("Error fetching properties:", error);
+      setProperties([]);
+    } finally {
+      setPropertiesLoading(false);
     }
   };
 
   const fetchServiceProviders = async (propertyId) => {
+    // Only fetch if propertyId is valid
+    if (!propertyId || !isValidObjectId(propertyId)) {
+      console.log(
+        "Skipping service providers fetch - invalid property ID:",
+        propertyId
+      );
+      setServiceProviders([]);
+      return;
+    }
+
     try {
+      console.log("Fetching service providers for property:", propertyId);
       const response = await servicesAPI.getPropertyProviders(propertyId);
-      setServiceProviders(response.data.availableProviders);
+      setServiceProviders(response.data.availableProviders || []);
     } catch (error) {
       console.error("Error fetching service providers:", error);
+      setServiceProviders([]);
     }
   };
 
   const fetchServiceRequests = async () => {
     try {
       const response = await servicesAPI.getRequests();
-      setRequests(response.data.requests);
+      setRequests(response.data.requests || []);
     } catch (error) {
       console.error("Error fetching service requests:", error);
+      setRequests([]);
     }
   };
 
   const handleSubmitRequest = async (e) => {
     e.preventDefault();
+
+    // Validate property ID
+    if (!formData.propertyId || !isValidObjectId(formData.propertyId)) {
+      alert(
+        "Please select a valid property. The property ID format is invalid."
+      );
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.category || !formData.title || !formData.description) {
+      alert(
+        "Please fill in all required fields: Service Type, Issue Title, and Description."
+      );
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      console.log("Submitting service request with data:", formData);
       await servicesAPI.submitRequest(formData);
       alert("Service request submitted successfully!");
+      // Reset form but keep the selected property
       setFormData({
         propertyId: selectedProperty,
         category: "",
@@ -96,17 +175,34 @@ const MaintenanceServices = () => {
       fetchServiceRequests();
     } catch (error) {
       console.error("Error submitting request:", error);
-      alert("Failed to submit service request");
+      alert(
+        "Failed to submit service request: " +
+          (error.message || "Please check if you have access to this property")
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+  };
+
+  const handlePropertyChange = (e) => {
+    const propertyId = e.target.value;
+    if (isValidObjectId(propertyId)) {
+      setSelectedProperty(propertyId);
+      setFormData({
+        ...formData,
+        propertyId: propertyId,
+      });
+    } else {
+      console.error("Invalid property ID selected:", propertyId);
+    }
   };
 
   const getUrgencyColor = (urgency) => {
@@ -185,172 +281,201 @@ const MaintenanceServices = () => {
             New Service Request
           </h2>
 
-          <form onSubmit={handleSubmitRequest} className="space-y-6">
-            {/* Property Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Property *
-              </label>
-              <select
-                name="propertyId"
-                value={formData.propertyId}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
+          {propertiesLoading ? (
+            <div className="text-center py-8">
+              <div className="text-xl">Loading properties...</div>
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-4">🏠</div>
+              <p className="text-gray-600 mb-4">No properties found</p>
+              <p className="text-sm text-gray-500 mb-4">
+                You need to be assigned to a property to submit service
+                requests. Please contact your landlord or administrator.
+              </p>
+              <button
+                onClick={fetchUserProperties}
+                className="px-4 py-2 bg-[#2b4354] text-white rounded-lg hover:bg-[#3c5a6a] transition-colors"
               >
-                <option value="">Choose a property</option>
-                {properties.map((property) => (
-                  <option key={property._id} value={property._id}>
-                    {property.address}
-                  </option>
-                ))}
-              </select>
+                Retry Loading Properties
+              </button>
             </div>
-
-            {/* Service Category */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Service Type *
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {categories.map((category) => (
-                  <button
-                    key={category.name}
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, category: category.name })
-                    }
-                    className={`p-4 border-2 rounded-xl text-center transition-colors ${
-                      formData.category === category.name
-                        ? "border-[#2b4354] bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">{category.icon}</div>
-                    <div className="font-medium text-gray-900">
-                      {category.name}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {category.description}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Request Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          ) : (
+            <form onSubmit={handleSubmitRequest} className="space-y-6">
+              {/* Property Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Issue Title *
+                  Select Property *
                 </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
+                <select
+                  name="propertyId"
+                  value={formData.propertyId}
+                  onChange={handlePropertyChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
+                >
+                  <option value="">Choose a property</option>
+                  {properties.map((property) => (
+                    <option key={property._id} value={property._id}>
+                      {property.address || `Property ${property._id}`}
+                    </option>
+                  ))}
+                </select>
+                {formData.propertyId &&
+                  !isValidObjectId(formData.propertyId) && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Invalid property selected. Please choose a valid property.
+                    </p>
+                  )}
+              </div>
+
+              {/* Rest of your form remains the same */}
+              {/* Service Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Service Type *
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {categories.map((category) => (
+                    <button
+                      key={category.name}
+                      type="button"
+                      onClick={() =>
+                        setFormData({ ...formData, category: category.name })
+                      }
+                      className={`p-4 border-2 rounded-xl text-center transition-colors ${
+                        formData.category === category.name
+                          ? "border-[#2b4354] bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <div className="text-2xl mb-2">{category.icon}</div>
+                      <div className="font-medium text-gray-900">
+                        {category.name}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {category.description}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Request Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Issue Title *
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., Leaky kitchen faucet"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Urgency Level *
+                  </label>
+                  <select
+                    name="urgency"
+                    value={formData.urgency}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
+                  >
+                    <option value="Low">Low - Can wait a few days</option>
+                    <option value="Medium">
+                      Medium - Should be addressed soon
+                    </option>
+                    <option value="High">
+                      High - Needs attention within 24 hours
+                    </option>
+                    <option value="Emergency">
+                      Emergency - Immediate attention required
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Detailed Description *
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
                   onChange={handleInputChange}
                   required
-                  placeholder="e.g., Leaky kitchen faucet"
+                  rows="4"
+                  placeholder="Please describe the issue in detail..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
                 />
               </div>
 
+              {/* Preferred Provider */}
+              {serviceProviders.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preferred Service Provider (Optional)
+                  </label>
+                  <select
+                    name="preferredProviderId"
+                    value={formData.preferredProviderId}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
+                  >
+                    <option value="">Landlord will assign a provider</option>
+                    {serviceProviders.map((provider) => (
+                      <option
+                        key={provider.serviceProvider?._id}
+                        value={provider.serviceProvider?._id}
+                      >
+                        {provider.serviceProvider?.name} -{" "}
+                        {provider.serviceProvider?.company} ({provider.category}
+                        )
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-500 mt-1">
+                    These are trusted providers recommended by your landlord
+                  </p>
+                </div>
+              )}
+
+              {/* Scheduled Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Urgency Level *
+                  Preferred Service Date (Optional)
                 </label>
-                <select
-                  name="urgency"
-                  value={formData.urgency}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
-                >
-                  <option value="Low">Low - Can wait a few days</option>
-                  <option value="Medium">
-                    Medium - Should be addressed soon
-                  </option>
-                  <option value="High">
-                    High - Needs attention within 24 hours
-                  </option>
-                  <option value="Emergency">
-                    Emergency - Immediate attention required
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Detailed Description *
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                required
-                rows="4"
-                placeholder="Please describe the issue in detail..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
-              />
-            </div>
-
-            {/* Preferred Provider */}
-            {serviceProviders.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preferred Service Provider (Optional)
-                </label>
-                <select
-                  name="preferredProviderId"
-                  value={formData.preferredProviderId}
+                <input
+                  type="datetime-local"
+                  name="scheduledDate"
+                  value={formData.scheduledDate}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
-                >
-                  <option value="">Landlord will assign a provider</option>
-                  {serviceProviders.map((provider) => (
-                    <option
-                      key={provider.serviceProvider._id}
-                      value={provider.serviceProvider._id}
-                    >
-                      {provider.serviceProvider.name} -{" "}
-                      {provider.serviceProvider.company} ({provider.category})
-                    </option>
-                  ))}
-                </select>
-                <p className="text-sm text-gray-500 mt-1">
-                  These are trusted providers recommended by your landlord
-                </p>
+                />
               </div>
-            )}
 
-            {/* Scheduled Date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Preferred Service Date (Optional)
-              </label>
-              <input
-                type="datetime-local"
-                name="scheduledDate"
-                value={formData.scheduledDate}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2b4354] bg-white text-gray-900"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full md:w-auto px-6 py-3 bg-[#2b4354] text-white rounded-xl hover:bg-[#3c5a6a] focus:outline-none focus:ring-2 focus:ring-[#2b4354] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isLoading ? "Submitting Request..." : "Submit Service Request"}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={isLoading || !isValidObjectId(formData.propertyId)}
+                className="w-full md:w-auto px-6 py-3 bg-[#2b4354] text-white rounded-xl hover:bg-[#3c5a6a] focus:outline-none focus:ring-2 focus:ring-[#2b4354] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isLoading ? "Submitting Request..." : "Submit Service Request"}
+              </button>
+            </form>
+          )}
         </div>
       )}
 
-      {/* Request History Tab */}
+      {/* Request History Tab - unchanged */}
       {activeTab === "history" && (
         <div className="bg-white rounded-2xl border border-gray-200">
           <div className="p-6 border-b border-gray-200">

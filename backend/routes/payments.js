@@ -90,6 +90,138 @@ router.post("/guest-payment", async (req, res) => {
   }
 });
 
+// Search for tenant/property (Fast Pay feature)
+router.post("/search-tenant", async (req, res) => {
+  try {
+    const { searchType, searchTerm } = req.body;
+
+    if (!searchType || !searchTerm) {
+      return res
+        .status(400)
+        .json({ error: "Search type and term are required" });
+    }
+
+    let query = { role: "tenant", isActive: true };
+
+    // Build search query based on type
+    switch (searchType) {
+      case "email":
+        query.email = { $regex: searchTerm, $options: "i" };
+        break;
+      case "tenantId":
+        query.tenantId = { $regex: searchTerm, $options: "i" };
+        break;
+      case "name":
+        query.name = { $regex: searchTerm, $options: "i" };
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid search type" });
+    }
+
+    // Find tenants with their properties
+    const tenants = await User.find(query)
+      .populate({
+        path: "currentProperty",
+        select: "title address rentAmount landlord",
+        populate: {
+          path: "landlord",
+          select: "name email",
+        },
+      })
+      .select("name email tenantId currentProperty balanceDue isActive")
+      .limit(10); // Limit results to prevent abuse
+
+    // Format results
+    const results = tenants.map((tenant) => ({
+      _id: tenant._id,
+      name: tenant.name,
+      email: tenant.email,
+      tenantId: tenant.tenantId,
+      propertyId: tenant.currentProperty?._id,
+      propertyTitle: tenant.currentProperty?.title,
+      propertyAddress: tenant.currentProperty?.address,
+      landlordName: tenant.currentProperty?.landlord?.name,
+      balanceDue: tenant.balanceDue || tenant.currentProperty?.rentAmount || 0,
+      isActive: tenant.isActive,
+    }));
+
+    res.json({
+      success: true,
+      data: results,
+      count: results.length,
+    });
+  } catch (error) {
+    console.error("Tenant search error:", error);
+    res.status(500).json({ error: "Search failed", details: error.message });
+  }
+});
+
+// Get tenant details by ID (for Fast Pay confirmation)
+router.get("/tenant-details/:tenantId", async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+
+    // Try to find by tenantId field first, then by _id
+    let tenant = await User.findOne({
+      tenantId: tenantId,
+      role: "tenant",
+      isActive: true,
+    });
+
+    if (!tenant) {
+      // Try to find by MongoDB _id
+      if (tenantId.match(/^[0-9a-fA-F]{24}$/)) {
+        tenant = await User.findOne({
+          _id: tenantId,
+          role: "tenant",
+          isActive: true,
+        });
+      }
+    }
+
+    if (!tenant) {
+      return res.status(404).json({ error: "Tenant not found or inactive" });
+    }
+
+    // Populate property and landlord info
+    const tenantWithDetails = await User.findById(tenant._id)
+      .populate({
+        path: "currentProperty",
+        select: "title address rentAmount landlord",
+        populate: {
+          path: "landlord",
+          select: "name email phone",
+        },
+      })
+      .select("name email tenantId phone balanceDue currentProperty");
+
+    res.json({
+      success: true,
+      data: {
+        _id: tenantWithDetails._id,
+        name: tenantWithDetails.name,
+        email: tenantWithDetails.email,
+        phone: tenantWithDetails.phone,
+        tenantId: tenantWithDetails.tenantId,
+        propertyId: tenantWithDetails.currentProperty?._id,
+        propertyTitle: tenantWithDetails.currentProperty?.title,
+        propertyAddress: tenantWithDetails.currentProperty?.address,
+        landlordName: tenantWithDetails.currentProperty?.landlord?.name,
+        landlordEmail: tenantWithDetails.currentProperty?.landlord?.email,
+        balanceDue:
+          tenantWithDetails.balanceDue ||
+          tenantWithDetails.currentProperty?.rentAmount ||
+          0,
+      },
+    });
+  } catch (error) {
+    console.error("Get tenant details error:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to get tenant details", details: error.message });
+  }
+});
+
 // Confirm and complete guest payment
 router.post("/confirm-guest-payment", async (req, res) => {
   try {
@@ -113,12 +245,30 @@ router.post("/confirm-guest-payment", async (req, res) => {
           paidAt: new Date(),
           stripeCustomerId: paymentIntent.customer,
           stripeChargeId: paymentIntent.latest_charge,
+          paymentMethod: paymentIntent.payment_method_types?.[0] || "card",
+          paymentMethodType: paymentIntent.payment_method_types?.[0] || "card",
         },
         { new: true }
-      ).populate("landlord property");
+      )
+        .populate("landlord")
+        .populate("property", "title address rentAmount")
+        .populate("tenant", "name email tenantId");
 
       if (!payment) {
         return res.status(404).json({ error: "Payment record not found" });
+      }
+
+      // Update tenant's balance (if tenant exists)
+      if (payment.tenant) {
+        const tenant = await User.findById(payment.tenant._id);
+        if (tenant) {
+          // Reduce the tenant's balance by payment amount
+          tenant.balanceDue = Math.max(
+            0,
+            (tenant.balanceDue || 0) - payment.amount
+          );
+          await tenant.save();
+        }
       }
 
       // Send receipts
@@ -126,7 +276,19 @@ router.post("/confirm-guest-payment", async (req, res) => {
 
       res.json({
         success: true,
-        payment: payment,
+        payment: {
+          _id: payment._id,
+          amount: payment.amount,
+          currency: payment.currency,
+          status: payment.status,
+          paidAt: payment.paidAt,
+          payerEmail: payment.payerEmail,
+          payerName: payment.payerName,
+          property: payment.property,
+          tenant: payment.tenant,
+          landlord: payment.landlord,
+          isGuestPayment: payment.isGuestPayment,
+        },
         message: "Payment completed successfully",
       });
     } else {
@@ -146,6 +308,150 @@ router.post("/confirm-guest-payment", async (req, res) => {
       error: "Payment confirmation failed",
       details: error.message,
     });
+  }
+});
+
+// Resend receipt endpoint
+router.post("/resend-receipt", async (req, res) => {
+  try {
+    const { paymentId, email, recipientType = "payer" } = req.body;
+
+    if (!paymentId || !email) {
+      return res
+        .status(400)
+        .json({ error: "Payment ID and email are required" });
+    }
+
+    const payment = await Payment.findById(paymentId)
+      .populate("landlord", "name email")
+      .populate("property", "title")
+      .populate("tenant", "name email");
+
+    if (!payment) {
+      return res.status(404).json({ error: "Payment not found" });
+    }
+
+    // Validate recipient type
+    const validRecipientTypes = ["payer", "tenant", "landlord"];
+    if (!validRecipientTypes.includes(recipientType)) {
+      return res.status(400).json({ error: "Invalid recipient type" });
+    }
+
+    // Resend receipt based on recipient type
+    let subject = "";
+    switch (recipientType) {
+      case "payer":
+        subject = `Payment Receipt (Resent) - ${payment._id}`;
+        break;
+      case "tenant":
+        subject = `Payment Notification (Resent) - ${payment._id}`;
+        break;
+      case "landlord":
+        subject = `Rent Payment Received (Resent) - ${payment._id}`;
+        break;
+    }
+
+    await sendReceiptEmail({
+      to: email,
+      subject: subject,
+      payment: payment,
+      type: recipientType,
+    });
+
+    // Update receipt sent status
+    const updateField = `receiptsSent.${recipientType}`;
+    await Payment.findByIdAndUpdate(paymentId, {
+      [updateField]: true,
+    });
+
+    res.json({
+      success: true,
+      message: `Receipt has been resent to ${email}`,
+      recipientType: recipientType,
+    });
+  } catch (error) {
+    console.error("Resend receipt error:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to resend receipt", details: error.message });
+  }
+});
+
+// Get payment details for receipt resending (public access)
+router.get("/guest-payment/:paymentId", async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+
+    const payment = await Payment.findById(paymentId)
+      .populate("landlord", "name email")
+      .populate("property", "title address")
+      .populate("tenant", "name email tenantId");
+
+    if (!payment) {
+      return res.status(404).json({ error: "Payment not found" });
+    }
+
+    // Basic payment info (no sensitive data)
+    res.json({
+      success: true,
+      data: {
+        _id: payment._id,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status,
+        paidAt: payment.paidAt,
+        payerEmail: payment.payerEmail,
+        payerName: payment.payerName,
+        property: payment.property,
+        tenant: payment.tenant,
+        landlord: payment.landlord,
+        isGuestPayment: payment.isGuestPayment,
+        receiptsSent: payment.receiptsSent,
+      },
+    });
+  } catch (error) {
+    console.error("Get guest payment error:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve payment", details: error.message });
+  }
+});
+
+// Get payment status
+router.get("/status/:paymentIntentId", async (req, res) => {
+  try {
+    const { paymentIntentId } = req.params;
+
+    // Check in Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    // Check in database
+    const payment = await Payment.findOne({
+      stripePaymentIntentId: paymentIntentId,
+    })
+      .populate("property", "title")
+      .populate("tenant", "name");
+
+    res.json({
+      success: true,
+      stripeStatus: paymentIntent.status,
+      payment: payment
+        ? {
+            _id: payment._id,
+            status: payment.status,
+            amount: payment.amount,
+            currency: payment.currency,
+            payerEmail: payment.payerEmail,
+            property: payment.property,
+            tenant: payment.tenant,
+          }
+        : null,
+    });
+  } catch (error) {
+    console.error("Get payment status error:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to get payment status", details: error.message });
   }
 });
 
@@ -218,11 +524,19 @@ router.post("/tenant-payment", auth, async (req, res) => {
       stripeCustomerId: stripeCustomerId,
       status: paymentIntent.status === "succeeded" ? "completed" : "processing",
       paidAt: paymentIntent.status === "succeeded" ? new Date() : null,
+      paymentMethod: paymentIntent.payment_method_types?.[0] || "card",
+      paymentMethodType: paymentIntent.payment_method_types?.[0] || "card",
     });
 
     await payment.save();
 
+    // Update tenant's balance
     if (paymentIntent.status === "succeeded") {
+      const tenant = await User.findById(tenantId);
+      if (tenant) {
+        tenant.balanceDue = Math.max(0, (tenant.balanceDue || 0) - amount);
+        await tenant.save();
+      }
       await sendReceipts(payment);
     }
 
@@ -408,15 +722,35 @@ async function sendReceipts(payment) {
       });
     }
 
+    // Send receipt to tenant (if exists and not the payer)
+    if (payment.tenant && payment.tenant.email !== payment.payerEmail) {
+      const tenant = await User.findById(payment.tenant);
+      if (tenant && tenant.email) {
+        await sendReceiptEmail({
+          to: tenant.email,
+          subject: `Payment Received on Your Account - ${payment._id}`,
+          payment: payment,
+          type: "tenant",
+        });
+      }
+    }
+
     // Update receipt sent status
-    await Payment.findByIdAndUpdate(payment._id, {
+    const updateData = {
       "receiptsSent.payer": true,
       "receiptsSent.landlord": true,
-    });
+    };
+
+    if (payment.tenant) {
+      updateData["receiptsSent.tenant"] = true;
+    }
+
+    await Payment.findByIdAndUpdate(payment._id, updateData);
 
     console.log("Receipts sent successfully for payment:", payment._id);
   } catch (error) {
     console.error("Error sending receipts:", error);
+    // Don't throw error here, as the payment is already successful
   }
 }
 

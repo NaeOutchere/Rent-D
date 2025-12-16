@@ -28,6 +28,7 @@ import {
 
 // Import the new pages
 import Account from "./pages/Account";
+import FastPay from "./components/FastPay";
 
 // Import the maintenance components (make sure these files exist)
 import MaintenanceServices from "./pages/MaintenanceServices";
@@ -133,6 +134,9 @@ const AppContent = () => {
                 </PublicRoute>
               }
             />
+            
+            <Route path="/fast-pay" element={<FastPay />} />
+
             <Route
               path="/signup"
               element={
